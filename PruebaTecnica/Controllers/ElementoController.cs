@@ -11,8 +11,9 @@ namespace PruebaTecnica.Controllers
         public IActionResult Index()
         {
 
-            // Esta lista para tener la persistencia de los datos Debe ser una consulta en la base de datos que devuelva la lista 
-            // Esta lista puede ser mas grande o mas pequeña dependiendo del ejemplo
+            /*Esta lista para tener la persistencia de los datos Debe ser una consulta en la base de datos que devuelva la lista 
+             se realiza por ejemplo  usando entity framework 
+             Esta lista puede ser mas grande o mas pequeña dependiendo del ejemplo*/
             var elementos = new List<Elemento>
             {
                 new Elemento { Nombre = "Cuerda", Peso = 5, Calorias = 3 },
@@ -78,7 +79,8 @@ namespace PruebaTecnica.Controllers
         }
 
 
-        // Con este metodo se seleccionaria la misma cantidad de elementos pero menos optimizado 
+        // Con este metodo se seleccionaria para el ejemplo (10 peso  y 15 calorias) la misma cantidad de elementos pero menos peso y mas calorias 
+        // En ejercicios de optimiacion hay diferentes alternativas todo depende de las reglas de negocio
        /* private List<Elemento> SeleccionarElementos(List<Elemento> elementos, int pesoMaximo, int caloriasMinimas)
         {
             List<Elemento> elementosSeleccionados = new List<Elemento>();
