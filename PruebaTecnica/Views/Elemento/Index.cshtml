@@ -6,7 +6,7 @@
 
 <div class="container mt-3">
     <div class="row">
-        <div class="col-6">
+        <div class="col-12">
             <h4>Artículos para Escalar</h4>
             <table class="table table-striped" id="elementosTable">
                 <thead>
@@ -28,23 +28,31 @@
                 </tbody>
             </table>
         </div>
-        <div class="col-3">
-            <h4 class="mt-4">Calcular Elementos Optimos</h4>
-            <form id="requisitosForm">
-                <div class="form-group">
-                    <label for="pesoMaximo">Peso Máximo:</label>
-                    <input type="number" class="form-control" id="pesoMaximo" name="pesoMaximo" required>
-                </div>
-                <div class="form-group">
-                    <label for="caloriasMinimas">Calorías Mínimas:</label>
-                    <input type="number" class="form-control" id="caloriasMinimas" name="caloriasMinimas" required>
-                </div>
-                <div class="form-group text-end pt-2 mt-2">
-                    <button type="button" class="btn btn-primary" onclick="validarYCalcular()">Calcular</button>
-                </div>
-                
-            </form>
-        </div>
+
+    </div>
+
+    <div class="row">
+    </div>
+    <div class="col-6">
+
+        <h4 class="mt-4">Calcular Elementos Optimos</h4>
+        <form id="requisitosForm">
+            <div class="form-group">
+                <label for="pesoMaximo">Peso Máximo:</label>
+                <input type="number" class="form-control" id="pesoMaximo" name="pesoMaximo" required>
+            </div>
+
+            <div class="form-group">
+                <label for="caloriasMinimas">Calorías Mínimas:</label>
+                <input type="number" class="form-control" id="caloriasMinimas" name="caloriasMinimas" required>
+            </div>
+
+            <div class="form-group text-start pt-2 mt-2">
+                <button type="button" class="btn btn-primary" onclick="validarYCalcular()">Calcular</button>
+            </div>
+
+        </form>
+
     </div>
 </div>
 
@@ -56,7 +64,9 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="modalBody">
-               
+                <div>
+                   
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -75,7 +85,7 @@
             // Si el formulario es válido, llamar a la función calcularElementos
             calcularElementos();
         } else {
-            // Si el formulario no es válido, mostrar un mensaje de error 
+            // Si el formulario no es válido, mostrar un mensaje de error
             alert("Por favor, ingrese el peso maximo y cantidad de calorias.");
         }
     }
@@ -89,16 +99,17 @@
             pesoMaximo: pesoMaximo,
             caloriasMinimas: caloriasMinimas,
             elementos: @Html.Raw(Json.Serialize(Model))
-                    };
+                        };
 
         // Realizamos la solicitud AJAX al servidor
         $.ajax({
             type: "POST",
-            url: "/Elemento/CalcularElementos", 
+            url: "/Elemento/CalcularElementos",
             data: requestData,
             success: function (response) {
                 console.log(response);
                 mostrarDatosEnModal(response);
+                
             },
             error: function (error) {
                 console.error(error);
@@ -121,6 +132,8 @@
                     "</thead>" +
                     "<tbody>";
 
+                var sumaPeso = 0;
+                var sumaCalorias = 0;
 
                 response.forEach(function (elemento) {
                     tabla += "<tr>" +
@@ -128,7 +141,18 @@
                         "<td>" + elemento.peso + "</td>" +
                         "<td>" + elemento.calorias + "</td>" +
                         "</tr>";
+
+                    // Sumar al total
+                    sumaPeso += elemento.peso;
+                    sumaCalorias += elemento.calorias;
                 });
+
+                // Agregar fila de suma al final de la tabla
+                tabla += "<tr>" +
+                    "<td><strong>Cantidades Totales</strong></td>" +
+                    "<td><strong>" + sumaPeso + "</strong></td>" +
+                    "<td><strong>" + sumaCalorias + "</strong></td>" +
+                    "</tr>";
 
                 // Cerramos la tabla
                 tabla += "</tbody></table>";
@@ -140,9 +164,15 @@
                 $("#modalBody").text("Error: Datos de respuesta no válidos");
             }
 
-            // Mostramos  el modal
+            // Mostramos el modal
             $("#miModal").modal("show");
         }
+
+
+      
+
+
+
 
 
 
