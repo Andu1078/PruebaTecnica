@@ -1,0 +1,150 @@
+﻿@model List<Elemento>
+
+@{
+    ViewData["Title"] = "Elementos Óptimos";
+}
+
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-6">
+            <h4>Artículos para Escalar</h4>
+            <table class="table table-striped" id="elementosTable">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Peso</th>
+                        <th>Calorías</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var Obj in Model)
+                    {
+                        <tr>
+                            <td>@Obj.Nombre</td>
+                            <td>@Obj.Peso</td>
+                            <td>@Obj.Calorias</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-6">
+            <h4 class="mt-4">Calcular Elementos</h4>
+            <form id="requisitosForm">
+                <div class="form-group">
+                    <label for="pesoMaximo">Peso Máximo:</label>
+                    <input type="number" class="form-control" id="pesoMaximo" name="pesoMaximo" required>
+                </div>
+                <div class="form-group">
+                    <label for="caloriasMinimas">Calorías Mínimas:</label>
+                    <input type="number" class="form-control" id="caloriasMinimas" name="caloriasMinimas" required>
+                </div>
+                <div class="form-group text-end pt-2 mt-2">
+                    <button type="button" class="btn btn-primary" onclick="validarYCalcular()">Calcular</button>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="miModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Elementos Óptimos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+               
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    function validarYCalcular() {
+        // Validar el formulario manualmente
+        var formulario = document.getElementById("requisitosForm");
+        if (formulario.checkValidity()) {
+            // Si el formulario es válido, llamar a la función calcularElementos
+            calcularElementos();
+        } else {
+            // Si el formulario no es válido, mostrar un mensaje de error 
+            alert("Por favor, ingrese el peso maximo y cantidad de calorias.");
+        }
+    }
+
+
+    function calcularElementos() {
+        var pesoMaximo = $("#pesoMaximo").val();
+        var caloriasMinimas = $("#caloriasMinimas").val();
+
+        var requestData = {
+            pesoMaximo: pesoMaximo,
+            caloriasMinimas: caloriasMinimas,
+            elementos: @Html.Raw(Json.Serialize(Model))
+                    };
+
+        // Realizamos la solicitud AJAX al servidor
+        $.ajax({
+            type: "POST",
+            url: "/Elemento/CalcularElementos", 
+            data: requestData,
+            success: function (response) {
+                console.log(response);
+                mostrarDatosEnModal(response);
+            },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+
+        function mostrarDatosEnModal(response) {
+            // Limpiamos el contenido del modal
+            $("#modalBody").empty();
+
+            if (Array.isArray(response) && response.length > 0) {
+                // Construimos la tabla con los datos recibidos
+                var tabla = "<table class='table'>" +
+                    "<thead>" +
+                    "<tr>" +
+                    "<th>Nombre</th>" +
+                    "<th>Peso</th>" +
+                    "<th>Calorías</th>" +
+                    "</tr>" +
+                    "</thead>" +
+                    "<tbody>";
+
+
+                response.forEach(function (elemento) {
+                    tabla += "<tr>" +
+                        "<td>" + elemento.nombre + "</td>" +
+                        "<td>" + elemento.peso + "</td>" +
+                        "<td>" + elemento.calorias + "</td>" +
+                        "</tr>";
+                });
+
+                // Cerramos la tabla
+                tabla += "</tbody></table>";
+
+                // Agregar la tabla al modal
+                $("#modalBody").append(tabla);
+            } else {
+                // Si la respuesta no es válida, mostramos un mensaje de error
+                $("#modalBody").text("Error: Datos de respuesta no válidos");
+            }
+
+            // Mostramos  el modal
+            $("#miModal").modal("show");
+        }
+
+
+
+    }
+</script>
