@@ -1,0 +1,74 @@
+﻿@model Elemento
+
+@section Styles {
+                    <link rel="stylesheet" href="~/css/TempData.css" />
+}
+
+<div class="container d-flex justify-content-end alert" id="mensajeContainer">
+    @if (TempData["Mensaje"] != null)
+    {
+                        <div class="alert custom-alert success">
+                            <div class="icon">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+                            <div class="message">@TempData["Mensaje"]</div>
+
+                        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+                        <div class="alert custom-alert error">
+                            <div class="icon">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                            </div>
+                            <div class="message">@TempData["Error"]</div>
+
+                        </div>
+    }
+</div>
+
+<div class="container">
+    <form method="post">
+
+        <div class="row pt-2 pb-1">
+            <div class="col-6">
+                <h2 class="text-primary">Nuevo Elemento </h2>
+            </div>
+
+            <div class="text-end col-md-6 mt-2">
+                <button type="submit" class=" w-25 btn btn-outline-primary">Agregar</button>
+            </div>
+
+        </div>
+
+        <div class="row">
+
+            <div class="col-md-3  m-2">
+                <div class="form-group">
+                    <label asp-for="Nombre">Nombre:</label>
+                    <input asp-for="Nombre" type="text" class="form-control" id="Nombre" name="Nombre"  required>
+                </div>
+            </div>
+            <div class="col-md-3  m-2">
+                <div class="form-group">
+                    <label asp-for="Peso">Peso:</label>
+                    <input asp-for="Peso" type="number" class="form-control" id="Peso" name="Peso" required>
+                </div>
+            </div>
+            <div class="col-md-3  m-2">
+                <div class="form-group">
+                    <label for="Calorias">Calorias:</label>
+                    <input asp-for="Calorias" type="number" class="form-control" id="Calorias" name="Calorias" required>
+                </div>
+            </div>
+
+
+        </div>
+
+
+    </form>
+
+
+
+</div>

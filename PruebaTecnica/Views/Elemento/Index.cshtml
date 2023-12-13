@@ -4,16 +4,59 @@
     ViewData["Title"] = "Elementos Óptimos";
 }
 
+
+
+
+
 <div class="container mt-3">
+    <div class="row pt-2 pb-4">
+        <div class="col-4">
+            <h4 class="text-dark">Artículos para Escalar</h4>
+        </div>
+
+        <div class="col-4 text-center" id="mensajeContainer">
+
+        
+                @if (TempData["Mensaje"] != null)
+                {
+                    <div class="alert custom-alert success">
+                        <div class="icon">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </div>
+                        <div class="message">@TempData["Mensaje"]</div>
+
+                    </div>
+                }
+
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert custom-alert error">
+                        <div class="icon">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                        </div>
+                        <div class="message">@TempData["Error"]</div>
+
+                    </div>
+                }
+           
+        </div>
+
+        <div class="col-4 text-end">
+            <a asp-controller="Elemento" asp-action="AgregarElemento" class="btn btn-outline-primary" title="Agregar Elemento"><i class="bi bi-plus-circle"></i> Agregar Elemento</a>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-12">
-            <h4>Artículos para Escalar</h4>
-            <table class="table table-striped" id="elementosTable">
+            
+            <table class="table table-striped  table-hover table-responsive p-1 table-sm  " id="elementosTable">
                 <thead>
                     <tr>
                         <th>Nombre</th>
                         <th>Peso</th>
                         <th>Calorías</th>
+                        <th>Acciones</th>
+
                     </tr>
                 </thead>
                 <tbody>
@@ -23,6 +66,24 @@
                             <td>@Obj.Nombre</td>
                             <td>@Obj.Peso</td>
                             <td>@Obj.Calorias</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Acciones
+                                    </button>
+                                    <div class="dropdown-menu text-success">
+                                        <a class="dropdown-item " asp-controller="Elemento" asp-action="Editar" asp-route-id="@Obj.Id_Elemento" title="Editar">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </a>
+                                        <a class="dropdown-item text-danger" href="#" onclick="eliminarElemento(@Obj.Id_Elemento)" title="Eliminar">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </a>
+
+                                   
+                                    </div>
+                                </div>
+                            </td>
+
                         </tr>
                     }
                 </tbody>
@@ -31,25 +92,35 @@
 
     </div>
 
-    <div class="row">
-    </div>
-    <div class="col-6">
+    <div class="col-12">
 
         <h4 class="mt-4">Calcular Elementos Optimos</h4>
         <form id="requisitosForm">
-            <div class="form-group">
-                <label for="pesoMaximo">Peso Máximo:</label>
-                <input type="number" class="form-control" id="pesoMaximo" name="pesoMaximo" required>
+            <div class="container">
+                <div class="row">
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label for="pesoMaximo">Peso Máximo:</label>
+                            <input type="number" class="form-control" id="pesoMaximo" name="pesoMaximo" required>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label for="caloriasMinimas">Calorías Mínimas:</label>
+                            <input type="number" class="form-control" id="caloriasMinimas" name="caloriasMinimas" required>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-group text-start pt-2 mt-2">
+                            <button type="button" class="btn btn-outline-primary" onclick="validarYCalcular()">Calcular</button>
+                        </div>
+                    </div>
+                </div>
             </div>
+           
+           
 
-            <div class="form-group">
-                <label for="caloriasMinimas">Calorías Mínimas:</label>
-                <input type="number" class="form-control" id="caloriasMinimas" name="caloriasMinimas" required>
-            </div>
-
-            <div class="form-group text-start pt-2 mt-2">
-                <button type="button" class="btn btn-primary" onclick="validarYCalcular()">Calcular</button>
-            </div>
+      
 
         </form>
 
@@ -161,7 +232,7 @@
                 $("#modalBody").append(tabla);
             } else {
                 // Si la respuesta no es válida, mostramos un mensaje de error
-                $("#modalBody").text("Error: Datos de respuesta no válidos");
+                $("#modalBody").text("Error: No se encontraron elementos en ese rango de peso maximo y calorias minimas");
             }
 
             // Mostramos el modal
@@ -169,12 +240,48 @@
         }
 
 
-      
-
-
-
-
-
-
     }
+
+
+    function eliminarElemento(id) {
+        if (confirm("¿Estás seguro de que deseas eliminar este elemento?")) {
+            $.ajax({
+                type: "POST",
+                url: "/Elemento/EliminarElemento",
+                data: { id: id },
+                success: function (response) {
+                    if (response.success) {
+                        // Elemento eliminado exitosamente
+                        alert(response.message);
+                        // Puedes recargar la página o actualizar la tabla de elementos si es necesario
+                        location.reload(); // Recarga la página
+                    } else {
+                        // Ocurrió un error al eliminar el elemento
+                        alert(response.message);
+                    }
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+        }
+    }
+
+
 </script>
+
+<script>
+    function ocultarMensaje() {
+        var mensajeContainer = document.getElementById("mensajeContainer");
+        setTimeout(function () {
+            mensajeContainer.style.opacity = "0"; // Cambia la opacidad a 0 para ocultar
+            setTimeout(function () {
+                mensajeContainer.style.display = "none"; // Oculta completamente después de la animación de opacidad
+            }, 500); // 500 milisegundos = 0.5 segundos (ajusta según tus necesidades)
+        }, 3000); // 3000 milisegundos = 3 segundos
+    }
+
+    // Llama a la función para ocultar el mensaje al cargar la página
+    document.addEventListener("DOMContentLoaded", ocultarMensaje);
+</script>
+

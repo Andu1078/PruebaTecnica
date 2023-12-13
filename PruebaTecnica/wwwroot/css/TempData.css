@@ -1,0 +1,59 @@
+﻿
+
+/* Estilo para mensaje de éxito */
+.custom-alert.success {
+    background-color: #dff0d8;
+    color: #2d882d;
+    border-color: #bce8a1;
+    border-radius: 5px;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+    .custom-alert.success .icon {
+        font-size: 24px;
+        margin-right: 10px;
+        color: #2d882d;
+    }
+
+    .custom-alert.success .message {
+        flex: 1;
+    }
+
+    .custom-alert.success .close-btn {
+        cursor: pointer;
+        font-size: 18px;
+        color: #2d882d;
+    }
+
+
+
+/* Estilo para mensaje de error */
+.custom-alert.error {
+    background-color: #f2dede;
+    color: #a94442;
+    border-color: #ebccd1;
+    border-radius: 5px;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+    .custom-alert.error .icon {
+        font-size: 24px;
+        margin-right: 10px;
+        color: #a94442;
+    }
+
+    .custom-alert.error .message {
+        flex: 1;
+    }
+
+    .custom-alert.error .close-btn {
+        cursor: pointer;
+        font-size: 18px;
+        color: #a94442;
+    }

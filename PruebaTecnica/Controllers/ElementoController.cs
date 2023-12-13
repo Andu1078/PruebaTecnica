@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PruebaTecnica.Data;
 using PruebaTecnica.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,21 +9,17 @@ namespace PruebaTecnica.Controllers
 {
     public class ElementoController : Controller
     {
+        private readonly ApplicationDbContext _db;
+
+        public ElementoController(ApplicationDbContext db)
+        {
+            _db = db;
+        }
         public IActionResult Index()
         {
-
-            /*Esta lista para tener la persistencia de los datos Debe ser una consulta en la base de datos que devuelva la lista 
-             se realiza por ejemplo  usando entity framework 
-             Esta lista puede ser mas grande o mas pequeña dependiendo del ejemplo*/
-            var elementos = new List<Elemento>
-            {
-                new Elemento { Nombre = "Cuerda", Peso = 5, Calorias = 3 },
-                new Elemento { Nombre = "Casco", Peso = 3, Calorias = 5 },
-                new Elemento { Nombre = "Mosquetones", Peso = 5, Calorias = 2 },
-                new Elemento { Nombre = "Arnés", Peso = 1, Calorias = 8 },
-                new Elemento { Nombre = "Botiquín", Peso = 2, Calorias = 3 }
-            };
+            List<Elemento> elementos = _db.tblelementos.ToList();
             return View(elementos);
+
         }
 
 
@@ -81,35 +78,113 @@ namespace PruebaTecnica.Controllers
 
         // Con este metodo se seleccionaria para el ejemplo (10 peso  y 15 calorias) la misma cantidad de elementos pero menos peso y mas calorias 
         // En ejercicios de optimiacion hay diferentes alternativas todo depende de las reglas de negocio
-       /* private List<Elemento> SeleccionarElementos(List<Elemento> elementos, int pesoMaximo, int caloriasMinimas)
+        /* private List<Elemento> SeleccionarElementos(List<Elemento> elementos, int pesoMaximo, int caloriasMinimas)
+         {
+             List<Elemento> elementosSeleccionados = new List<Elemento>();
+             int pesoActual = 0;
+             int caloriasTotales = 0;
+
+             // Ordena los elementos por la relación calorías/peso de mayor a menor
+             elementos = elementos.OrderByDescending(e => (double)e.Calorias / e.Peso).ToList();
+
+             foreach (var elemento in elementos)
+             {
+                 if (pesoActual + elemento.Peso <= pesoMaximo)
+                 {
+                     elementosSeleccionados.Add(elemento);
+                     pesoActual += elemento.Peso;
+                     caloriasTotales += elemento.Calorias;
+
+                     // Verifica si se ha alcanzado o superado las calorías mínimas después de agregar el elemento
+                     if (caloriasTotales > caloriasMinimas)
+                     {
+                         break;  // Sale del bucle si se alcanzan las calorías mínimas
+                     }
+                 }
+             }
+
+             return elementosSeleccionados;
+         }*/
+
+        public IActionResult AgregarElemento()
         {
-            List<Elemento> elementosSeleccionados = new List<Elemento>();
-            int pesoActual = 0;
-            int caloriasTotales = 0;
+            return View();
+        }
 
-            // Ordena los elementos por la relación calorías/peso de mayor a menor
-            elementos = elementos.OrderByDescending(e => (double)e.Calorias / e.Peso).ToList();
-
-            foreach (var elemento in elementos)
+        //Enviamos los datos del formulario y mostramos la tabla Viaje
+        [HttpPost]
+        public IActionResult AgregarElemento(Elemento Obj)
+        {
+            if (ModelState.IsValid)
             {
-                if (pesoActual + elemento.Peso <= pesoMaximo)
-                {
-                    elementosSeleccionados.Add(elemento);
-                    pesoActual += elemento.Peso;
-                    caloriasTotales += elemento.Calorias;
+                _db.tblelementos.Add(Obj);
+                _db.SaveChanges();
+                TempData["Mensaje"] = "El elemento ha sido ingresado con exito.";
+                return RedirectToAction("Index");
+            }
+            TempData["Error"] = "No se pudo ingresar el elemento.";
+            return RedirectToAction("Index");
 
-                    // Verifica si se ha alcanzado o superado las calorías mínimas después de agregar el elemento
-                    if (caloriasTotales > caloriasMinimas)
-                    {
-                        break;  // Sale del bucle si se alcanzan las calorías mínimas
-                    }
-                }
+        }
+
+        [HttpPost]
+        public IActionResult EliminarElemento(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
             }
 
-            return elementosSeleccionados;
-        }*/
+            Elemento Obj = _db.tblelementos.Find(id);
+
+            if (Obj == null)
+            {
+                return NotFound();
+            }
+
+            _db.tblelementos.Remove(Obj);
+            _db.SaveChanges();
+
+            // Devuelve un objeto JSON con las propiedades esperadas
+            return Json(new { success = true, message = "El artículo se eliminó correctamente." });
+        }
+
+        public IActionResult Editar(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            Elemento elemento = _db.tblelementos.Find(id);
+
+            if (elemento == null)
+            {
+
+                return NotFound();
+            }
+            return View(elemento);
+        }
 
 
+        [HttpPost]
+        public IActionResult Editar(Elemento Obj)
+        {
+
+            if (ModelState.IsValid)
+            {
+
+                _db.tblelementos.Update(Obj);
+                _db.SaveChanges();
+                TempData["Mensaje"] = "El Elemeto  ha sido Editado con éxito.";
+                return RedirectToAction("Index");
+
+            }
+            TempData["Error"] = "El Elemento no fue editado correctamente.";
+            return RedirectToAction("Index");
+
+
+
+        }
 
     }
 }
